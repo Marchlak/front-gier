@@ -97,7 +97,7 @@ function paintBadge(canvas, kind) {
     const palettes={
       jakitohit:["#604255","#f4d8bb"],
       songless:["#385668","#94e2d5"], bandle:["#5f5374","#cba6f7"],
-      moviespot:["#554955","#f3bc91"]
+      moviespot:["#554955","#f3bc91"], metromania:["#344a55","#edbb75"]
     };
     const [field,ink]=palettes[kind];
     box(0,0,100,84,field);
@@ -148,6 +148,18 @@ function paintBadge(canvas, kind) {
       box(-1,-33,1,52,"#e9d9bb");box(1,6,1,13,"#c5beb2");
       box(8,16,2,2,"#eee1ca");box(8,21,2,2,"#eee1ca");
       ctx.restore();
+    } else if(kind==="metromania"){
+      // Front of a metro train emerging from a tunnel.
+      poly([[18,65],[18,36],[23,22],[33,13],[43,10],[57,10],[67,13],[77,22],
+            [82,36],[82,65]],"#263741");
+      poly([[24,75],[37,59],[41,59],[30,75]],"#889398");
+      poly([[59,59],[63,59],[76,75],[70,75]],"#889398");
+      poly([[31,55],[31,29],[35,21],[42,18],[58,18],[65,21],[69,29],[69,55],
+            [64,62],[36,62]],ink);
+      box(35,31,30,15,"#31444f");box(37,33,11,9,"#86aeb5");box(52,33,11,9,"#86aeb5");
+      box(42,23,16,4,"#39434b");box(46,24,8,2,"#f4d69c");
+      box(32,48,36,5,"#ba604b");box(35,51,6,4,"#ffe7ac");box(59,51,6,4,"#ffe7ac");
+      box(41,58,18,3,"#59626a");
     } else {
       box(21,33,58,33,"#343641");box(21,32,58,4,ink);
       poly([[20,29],[76,16],[78,23],[22,36]],"#d3c6ad");

@@ -6,7 +6,8 @@ const games=[
   {id:"bandle",name:"Bandle",url:"https://bandle.app/menu"},
   {id:"krill",name:"Krillion",url:"https://krillion.io/"},
   {id:"nisza",name:"Celuj w niszę!",url:"https://wnisze.pl/"},
-  {id:"moviespot",name:"MovieSpot",url:"https://allspot.net/moviespot"}
+  {id:"moviespot",name:"MovieSpot",url:"https://allspot.net/moviespot"},
+  {id:"metromania",name:"Metromania",url:"https://metromania.pl/"}
 ];
 const cards=document.getElementById("cards");
 const segments=document.getElementById("segments");
