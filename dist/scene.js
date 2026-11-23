@@ -37,49 +37,53 @@ function paintBadge(canvas, kind) {
     poly([[68,33],[80,24],[92,23],[81,26]],"#fac4a4");
     poly([[69,35],[86,30],[97,31],[86,32]],"#fac4a4");
   } else if(kind==="loldle") {
-    // Teemo's scout cap, feather and cheek tufts, drawn directly on the badge grid.
-    box(0,0,100,84,"#324e52");
-    for(let i=0;i<52;i++) box(rand()*100,rand()*84,1+rand()*3,1,"#496262");
-    poly([[20,84],[23,74],[35,65],[62,64],[74,70],[81,84]],"#343d38");
-    poly([[23,84],[27,74],[36,69],[59,66],[71,73],[77,84]],"#75815a");
-    poly([[33,68],[60,64],[68,68],[57,76],[48,74],[42,81]],"#b95646");
-    poly([[36,69],[59,66],[61,69],[47,74]],"#e17a5a");
-    // Pointed ears project past the cap.
-    poly([[18,17],[22,17],[38,31],[30,47],[22,43],[18,32]],"#684d47");
-    poly([[21,21],[32,32],[26,39],[22,34]],"#e8b795");
-    poly([[65,31],[80,18],[83,18],[82,37],[73,48],[67,42]],"#684d47");
-    poly([[69,34],[80,22],[78,36],[73,40]],"#e8b795");
-    poly([[29,32],[66,31],[74,42],[76,48],[82,50],[77,54],[81,56],
-          [74,60],[71,65],[64,65],[57,70],[44,71],[36,67],[29,66],
-          [25,61],[19,59],[23,55],[18,52],[23,49]],"#9a7258");
-    poly([[28,42],[69,39],[73,49],[78,51],[71,54],[75,56],[67,61],
-          [62,62],[56,67],[45,69],[36,64],[30,63],[25,59],[29,56],
-          [23,54],[29,51]],"#edc697");
-    poly([[30,51],[41,50],[48,54],[54,53],[62,49],[71,48],[68,56],
-          [63,61],[55,66],[46,67],[37,62]],"#ffe1b1");
-    // Teemo's closed-eye grin and small rust-coloured nose.
-    poly([[32,51],[35,47],[39,46],[43,47],[45,50],[39,49],[36,49]],"#493d3c");
-    poly([[55,48],[58,44],[63,43],[68,46],[62,46],[59,46]],"#493d3c");
-    poly([[46,53],[50,51],[54,52],[53,55],[49,57]],"#79524a");
-    poly([[43,59],[49,61],[56,58],[54,62],[50,64],[46,63]],"#755043");
-    // A tilted olive cap with brass-rimmed red lenses.
-    poly([[23,43],[25,32],[31,22],[41,17],[56,16],[67,20],[73,29],
-          [75,38],[68,42],[35,47],[25,47]],"#404c3d");
-    poly([[26,40],[29,32],[34,24],[42,20],[54,18],[64,21],[69,27],[70,33]],"#909651");
-    poly([[32,31],[39,23],[50,20],[54,21],[45,25],[41,29]],"#b5b473");
-    poly([[24,40],[35,35],[67,29],[74,31],[77,35],[70,40],[37,46],[23,47]],"#627145");
-    poly([[27,41],[38,37],[69,31],[73,32],[65,35],[34,42]],"#a7a761");
-    poly([[28,32],[64,24],[68,26],[30,38]],"#694e40");
-    for(const [x,y] of [[33,29],[48,26]]){
-      poly([[x,y+2],[x+3,y-1],[x+10,y-1],[x+12,y+1],[x+11,y+7],
-            [x+8,y+9],[x+2,y+9],[x,y+7]],"#e7b874");
-      poly([[x+2,y+2],[x+5,y+1],[x+9,y+1],[x+10,y+3],[x+8,y+6],
-            [x+3,y+7]],"#ac4f46");
-      box(x+3,y+2,4,2,"#f49572");
+    // Ziggs: swept ears, aviator goggles and a jagged grin on the same pixel grid as the other cards.
+    box(0,0,100,84,"#413b50");
+    for(let i=0;i<55;i++) box(rand()*100,rand()*84,1+rand()*3,1,"#554758");
+    poly([[13,84],[19,71],[34,62],[57,61],[77,73],[81,84]],"#49363e");
+    poly([[18,84],[22,74],[35,67],[44,73],[55,66],[72,73],[76,84]],"#935744");
+    poly([[26,84],[50,67],[57,69],[36,84]],"#cea270");
+    box(38,76,8,4,"#493f42");box(40,76,5,2,"#f6c882");
+    // Long, fanned-out ears and soft cheek tufts frame the leather cap.
+    poly([[32,31],[8,16],[12,31],[9,30],[16,39],[25,46],[36,45]],"#c38660");
+    poly([[30,35],[13,22],[18,34],[25,40]],"#98555c");
+    poly([[59,30],[87,11],[83,24],[87,20],[83,32],[74,41],[62,43]],"#d89b70");
+    poly([[65,33],[82,17],[78,28],[70,36]],"#ae6667");
+    poly([[25,30],[34,18],[54,15],[67,22],[72,37],[70,44],[75,46],[70,49],
+          [73,52],[65,54],[61,62],[47,70],[35,67],[23,57],[18,56],[22,52],[17,51],[23,46]],"#bf8059");
+    poly([[23,46],[34,39],[56,36],[66,40],[63,47],[69,46],[62,53],[55,61],[46,66],
+          [34,63],[26,55],[29,54],[22,51],[29,49]],"#f2c794");
+    poly([[24,34],[24,24],[30,17],[39,14],[53,13],[61,16],[67,23],[66,30],[55,26],[31,39]],"#71493e");
+    poly([[29,25],[32,18],[39,17],[34,22]],"#aa714c");
+    poly([[39,17],[33,10],[42,12],[40,6],[48,12],[52,7],[52,14],[61,11],[56,19]],"#ecbd8d");
+    poly([[42,48],[48,44],[53,45],[54,48],[49,52],[44,51]],"#513c40");
+    poly([[29,51],[38,54],[47,55],[55,51],[64,45],[62,54],[55,61],[47,65],[39,63],[32,58]],"#492e38");
+    poly([[32,52],[38,54],[37,58]],"#fff0cf");
+    poly([[39,54],[46,55],[44,60]],"#fce0b8");
+    poly([[47,55],[54,52],[51,59]],"#ffeac7");
+    poly([[55,51],[62,47],[59,54]],"#fff0cf");
+    poly([[43,63],[49,59],[54,58],[51,62]],"#cf796d");
+    // Brass lens rims, ember-coloured glass and a reflected glint.
+    poly([[22,35],[63,22],[72,23],[70,29],[23,42]],"#604245");
+    for(const [x,y] of [[25,31],[46,25]]){
+      poly([[x,y+4],[x+4,y],[x+14,y-2],[x+19,y+1],[x+20,y+9],
+            [x+16,y+15],[x+6,y+17],[x+1,y+14]],"#4f3d43");
+      poly([[x+1,y+5],[x+5,y+1],[x+14,y-1],[x+18,y+2],[x+18,y+9],
+            [x+15,y+13],[x+6,y+15],[x+2,y+12]],"#d9a660");
+      poly([[x+4,y+6],[x+7,y+3],[x+14,y+2],[x+16,y+4],[x+15,y+9],
+            [x+12,y+12],[x+7,y+12],[x+4,y+10]],"#b95535");
+      poly([[x+7,y+9],[x+15,y+5],[x+14,y+9],[x+10,y+11],[x+7,y+11]],"#f29b45");
+      box(x+6,y+5,5,2,"#ffe5a0");
     }
-    poly([[64,26],[66,15],[73,7],[83,4],[81,11],[74,13],[77,14],
-          [73,18],[69,19],[66,26]],"#c95c51");
-    poly([[65,25],[70,15],[79,8],[74,14],[69,19]],"#ffaf80");
+    // Round bomb tucked against his shoulder.
+    poly([[60,67],[64,60],[71,56],[79,56],[87,61],[91,69],[90,78],[85,84],
+          [63,84],[59,77]],"#292d3b");
+    poly([[63,68],[67,62],[73,59],[80,60],[85,64],[82,63],[73,64],[67,70]],"#606071");
+    poly([[61,74],[68,78],[78,79],[89,75],[88,79],[79,83],[69,82],[62,79]],"#c5834e");
+    box(71,55,8,4,"#9e7857");
+    poly([[73,55],[73,50],[80,46],[82,42],[84,42],[82,48],[76,52],[76,55]],"#e2ae71");
+    poly([[83,35],[85,40],[90,39],[87,43],[91,45],[85,45],[82,49],[82,44],[77,42],[82,41]],"#ed9462");
+    box(82,41,3,3,"#ffe7a4");
   } else if(kind==="nisza") {
     box(0,0,100,84,"#8a778c");box(0,36,100,48,"#66667a");
     box(73,12,10,10,"#f5c59f");
@@ -556,32 +560,44 @@ function paintBadge(canvas, kind) {
       poly([[sx-2,sy-8],[sx,sy-8],[sx+1,sy],[sx-1,sy]],"#fff0b9");
     }
   }
-  function newSkyPass(start) {
-    return {start, direction:Math.random()<.5 ? -1 : 1,
-      height:between(.12,.32), slope:between(-.065,.065), duration:between(.85,1.2)};
-  }
-  let skyPass=newSkyPass(between(3,7));
-  function skyTracers() {
-    const age=elapsed-skyPass.start;
-    if(age<0) return;
-    if(age>skyPass.duration+.6) {
-      skyPass=newSkyPass(elapsed+between(10,19));
-      return;
+  // Perspective is expressed in screen pixels, travel time and the scene layer that hides each streak.
+  const tracerPlanes={
+    far: {size:.55, duration:1.48, altitude:[.43,.58], tail:"#af9584", core:"#ddc7ad"},
+    middle: {size:1, duration:1.00, altitude:[.23,.50], tail:"#d39c77", core:"#ffe1ae"},
+    near: {size:1.55, duration:.67, altitude:[.14,.70], tail:"#e89e64", core:"#fff2c7"}
+  };
+  function newSkyPass(start,direction) {
+    const order=["far","middle","near","middle"];
+    for(let i=order.length-1;i>0;i--){
+      const j=Math.floor(Math.random()*(i+1));
+      [order[i],order[j]]=[order[j],order[i]];
     }
-    const direction=skyPass.direction;
-    for(let i=0;i<4;i++) {
-      const phase=(age-i*.16)/skyPass.duration;
+    const shots=order.map((depth,i)=>{
+      const plane=tracerPlanes[depth];
+      return {depth,plane,delay:i*.16,height:between(...plane.altitude),slope:between(-.06,.06)};
+    });
+    const end=start+Math.max(...shots.map(shot=>shot.delay+shot.plane.duration));
+    return {start,end,direction,shots};
+  }
+  let skyPass=newSkyPass(between(3,7),Math.random()<.5 ? -1 : 1);
+  function skyTracers(depth) {
+    const age=elapsed-skyPass.start;
+    if(age<0 || elapsed>skyPass.end) return;
+    for(const shot of skyPass.shots) {
+      if(shot.depth!==depth) continue;
+      const {size,duration,tail,core}=shot.plane;
+      const phase=(age-shot.delay)/duration;
       if(phase<0 || phase>1) continue;
-      const travel=-26+phase*(w+52);
-      const x=direction===1 ? travel : w-travel;
-      const y=h*(skyPass.height+phase*skyPass.slope)+[0,4,-3,2][i];
+      const margin=Math.ceil(25*size), span=w+2*margin;
+      const travel=phase*span-margin;
+      const x=skyPass.direction===1 ? travel : w-travel;
+      const y=h*(shot.height+phase*shot.slope);
       ctx.save();
       ctx.translate(Math.round(x),Math.round(y));
-      ctx.scale(direction,1);
-      const lift=-skyPass.slope*h*18/(w+52);
-      poly([[-21,lift],[-11,lift-1],[0,-1],[1,1],[-10,2+lift]],"#d59c76");
-      box(-6,-1,6,2,"#ffe8bb");
-      box(0,-1,3,2,"#faf1ce");
+      ctx.scale(skyPass.direction*size,size);
+      const lift=-shot.slope*h*21/span;
+      poly([[-21,lift],[-11,lift*.5-1],[0,-1],[1,1],[-10,lift*.5+2]],tail);
+      box(-5,-1,8,2,core);
       ctx.restore();
     }
   }
@@ -737,11 +753,13 @@ function paintBadge(canvas, kind) {
       passStart=elapsed;
       nextUnit();
     }
+    if(elapsed>skyPass.end) skyPass=newSkyPass(elapsed+between(10,19),-skyPass.direction);
     ctx.drawImage(background,0,0);
+    skyTracers("far");
     distantFire();
     ctx.drawImage(ruins,0,0);
-    skyTracers();
     artillery();
+    skyTracers("middle");
     const age=elapsed-passStart;
     const progress=age/current.duration;
     const margin=Math.ceil(current.margin*spriteScale);
@@ -761,6 +779,7 @@ function paintBadge(canvas, kind) {
     ctx.restore();
     ctx.drawImage(foreground,0,0);
     trenchCrew();
+    skyTracers("near");
   }
   function resize(){
     const bounds=canvas.getBoundingClientRect();
