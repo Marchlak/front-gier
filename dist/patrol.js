@@ -1,7 +1,12 @@
 "use strict";
 const games=[
+  {id:"loldle",name:"LoLdle",url:"https://loldle.net/"},
+  {id:"jakitohit",name:"Jaki to hit?",url:"https://jakitohit.pl/"},
+  {id:"songless",name:"Songless",url:"https://lessgames.com/songless"},
+  {id:"bandle",name:"Bandle",url:"https://bandle.app/menu"},
   {id:"krill",name:"Krillion",url:"https://krillion.io/"},
-  {id:"nisza",name:"Celuj w niszę!",url:"https://wnisze.pl/"}
+  {id:"nisza",name:"Celuj w niszę!",url:"https://wnisze.pl/"},
+  {id:"moviespot",name:"MovieSpot",url:"https://allspot.net/moviespot"}
 ];
 const cards=document.getElementById("cards");
 const segments=document.getElementById("segments");

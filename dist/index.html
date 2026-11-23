@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#181825">
   <title>Front Gier — codzienny patrol</title>
   <link rel="stylesheet" href="style.css">
+  <script defer src="vehicles.js"></script>
   <script defer src="scene.js"></script>
   <script defer src="patrol.js"></script>
 </head>
@@ -16,9 +17,10 @@
       <time id="date"></time>
     </header>
     <section class="hero" aria-labelledby="title">
-      <canvas id="landscape" role="img" aria-label="Wzdłuż okopów przejeżdżają czołg i BTR, a za nimi maszeruje trzech żołnierzy. Nad nimi przelatują kolejno samolot wojskowy, rakieta i dron Shahed."></canvas>
+      <canvas id="landscape" role="img" aria-label="Pikselowy patrol na tle okopów. Na horyzoncie czasem widać ostrzał artyleryjski."></canvas>
       <div class="shade"></div>
       <div class="intro"><h1 id="title">Codzienny<br><em>patrol.</em></h1></div>
+      <span id="unit-name" class="unit-name"></span>
       <button id="motion" type="button" aria-label="Wstrzymaj animację" title="Wstrzymaj animację">Ⅱ</button>
     </section>
     <section aria-labelledby="games-title" class="games">

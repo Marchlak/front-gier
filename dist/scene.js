@@ -35,7 +35,7 @@ function paintBadge(canvas, kind) {
     for(let i=0;i<5;i++) {const x=37+i*5,y=50-i*2;poly([[x,y],[x+2,y],[x+6,y+8],[x+3,y+7]],"#e39587")}
     poly([[68,33],[80,24],[92,23],[81,26]],"#fac4a4");
     poly([[69,35],[86,30],[97,31],[86,32]],"#fac4a4");
-  } else {
+  } else if(kind==="nisza") {
     box(0,0,100,84,"#8a778c");box(0,36,100,48,"#66667a");
     box(73,12,10,10,"#f5c59f");
     for(let i=0;i<8;i++) {const x=i*15,y=34+rand()*22;box(x,y,13,84-y,"#55566c")}
@@ -48,6 +48,41 @@ function paintBadge(canvas, kind) {
     box(63,49,21,35,"#4b495c");box(62,47,23,3,"#39394b");
     for(let i=0;i<6;i++) box(66+(i%3)*6,54+Math.floor(i/3)*10,3,5,"#e7ad88");
     box(0,80,100,4,"#303244");
+  } else {
+    const palettes={
+      loldle:["#254657","#a3c7b5"], jakitohit:["#764b63","#fab387"],
+      songless:["#385668","#94e2d5"], bandle:["#5f5374","#cba6f7"],
+      moviespot:["#554955","#f3bc91"]
+    };
+    const [field,ink]=palettes[kind];
+    box(0,0,100,84,field);
+    for(let i=0;i<65;i++) box(rand()*100,rand()*84,1+rand()*4,1,"#ffffff14");
+    if(kind==="loldle"){
+      poly([[30,57],[65,19],[75,11],[72,26],[38,60]],"#d1dee1");
+      poly([[36,57],[74,12],[71,27],[39,61]],ink);
+      poly([[29,54],[40,64],[36,68],[24,58]],"#eab777");
+      poly([[28,59],[34,63],[23,74],[18,69]],"#967657");
+    } else if(kind==="jakitohit"){
+      poly([[34,51],[40,55],[28,70],[24,67]],"#d9b292");
+      poly([[34,49],[51,28],[60,36],[42,56]],"#3c3947");
+      poly([[47,27],[53,20],[62,17],[69,20],[73,27],[70,34],[62,40],[55,39]],ink);
+      for(let i=0;i<3;i++) poly([[51+i*3,25-i],[53+i*3,23-i],[67+i,33-i*2],[65+i,35-i*2]],"#936678");
+    } else if(kind==="songless"){
+      box(18,23,64,40,"#233744");box(21,25,58,34,ink);box(26,30,48,20,"#557b84");
+      for(const x of [35,62]){box(x-5,35,10,9,"#ced9cc");box(x-2,38,4,4,"#354954")}
+      box(40,37,17,5,"#344957");
+      poly([[29,58],[34,51],[66,51],[71,58]],"#708b90");box(36,55,28,2,"#334652");
+    } else if(kind==="bandle"){
+      poly([[25,59],[30,49],[37,48],[41,41],[49,41],[54,46],[51,53],[46,55],[44,64],[38,69],[28,68],[24,64]],ink);
+      poly([[40,53],[66,22],[70,25],[45,57]],"#e4bb97");
+      poly([[63,24],[70,14],[77,16],[73,24],[68,29]],"#dab88e");
+      box(38,52,6,6,"#51465c");box(29,61,7,2,"#715d70");
+    } else {
+      box(21,33,58,33,"#343641");box(21,32,58,4,ink);
+      poly([[20,29],[76,16],[78,23],[22,36]],"#d3c6ad");
+      for(let i=0;i<5;i++){const x=24+10*i,y=28-i*2.3;poly([[x,y],[x+4,y-1],[x+1,y+6],[x-3,y+7]],"#3b3942")}
+      poly([[45,42],[45,57],[59,49]],ink);
+    }
   }
 }
 
@@ -57,7 +92,7 @@ function paintBadge(canvas, kind) {
   const {box,poly}=brush(ctx);
   const motion=document.getElementById("motion");
   const preference=matchMedia("(prefers-reduced-motion: reduce)");
-  let moving=!preference.matches, elapsed=preference.matches ? 4 : 0, last=0, frame=0;
+  let moving=!preference.matches, elapsed=0, last=0, frame=0;
   let background, foreground, w, h, ground, spriteScale;
   function layer(draw) {
     const layer=document.createElement("canvas");
@@ -250,30 +285,102 @@ function paintBadge(canvas, kind) {
     });
   }
 
-  // Times are seconds in a repeating patrol. The margin includes the whole sprite.
-  const passes=[
-    {draw:tank,    start:0,    duration:10,  margin:76, altitude:0},
-    {draw:jet,     start:1,    duration:5,   margin:46, altitude:.15},
-    {draw:rocket,  start:7,    duration:3.8, margin:42, altitude:.19},
-    {draw:carrier, start:10.7, duration:10,  margin:56, altitude:0},
-    {draw:shahed,  start:13.2, duration:8,   margin:30, altitude:.15},
-    {draw:footPatrol, start:21.4, duration:12, margin:45, altitude:0}
+  const roster = [
+    {name:"Czołg", draw:tank, duration:9, margin:76},
+    {name:"Samolot wojskowy", draw:jet, duration:5, margin:46, altitude:.15},
+    {name:"Rakieta", draw:rocket, duration:4, margin:42, altitude:.19},
+    {name:"BTR", draw:carrier, duration:8, margin:56},
+    {name:"Shahed", draw:shahed, duration:7, margin:30, altitude:.15},
+    {name:"Patrol pieszy", draw:footPatrol, duration:10, margin:45},
+    ...additionalVehicles({box,poly},wheel)
   ];
-  function draw() {
-    ctx.drawImage(background,0,0);
-    const time=elapsed%34;
-    for(const pass of passes) {
-      const progress=(time-pass.start)/pass.duration;
-      if(progress<0 || progress>1) continue;
-      const margin=Math.ceil(pass.margin*spriteScale);
-      const x=-margin+(w+2*margin)*progress;
-      const y=pass.altitude ? h*pass.altitude : ground;
-      ctx.save();
-      ctx.translate(Math.round(x),Math.round(y));
-      ctx.scale(spriteScale,spriteScale);
-      pass.draw(elapsed);
-      ctx.restore();
+  const nameLabel = document.getElementById("unit-name");
+  let remaining = [], current, passStart = 0;
+  function nextUnit() {
+    if (!remaining.length) remaining = roster.slice();
+    // On refill the previous unit remains available after this first draw.
+    const choices = remaining.filter(unit => unit !== current);
+    current = choices[Math.floor(Math.random()*choices.length)];
+    remaining.splice(remaining.indexOf(current),1);
+    nameLabel.textContent = current.name;
+  }
+  nextUnit();
+  if (preference.matches) elapsed = current.duration*.64;
+
+  const between = (min,max) => min + Math.random()*(max-min);
+  let salvoStart = between(9,16);
+  let horizonX = between(.56,.86);
+  function fireball(x,y,r,color) {
+    const shoulder=Math.round(r*.58);
+    poly([[x-shoulder,y-r],[x+shoulder,y-r],[x+r,y-shoulder],[x+r,y+shoulder],
+          [x+shoulder,y+r],[x-shoulder,y+r],[x-r,y+shoulder],[x-r,y-shoulder]],color);
+  }
+  function impact(x,y,age) {
+    // Layer short-lived pixel fireballs over a slower column of smoke.
+    ctx.save();
+    const smoke=age/2.1;
+    ctx.globalAlpha=(1-smoke)*.88;
+    for(let i=0;i<5;i++) {
+      const puffX=x+Math.sin(i*2.4)*(4+smoke*6)+smoke*8;
+      const puffY=y-4-i*2-smoke*(12+i*4);
+      fireball(puffX,puffY,3+smoke*5+i%2,i%2?"#625968":"#716572");
     }
+    ctx.restore();
+    if(age>.68) return;
+    const phase=age/.68;
+    const bloom=Math.sin(Math.sqrt(phase)*Math.PI);
+    const radius=2+10*bloom;
+    for(const [dx,dy,size,color] of [
+      [-.7,-.55,.76,"#c45f46"],[.72,-.53,.78,"#d77048"],
+      [0,-1.24,.88,"#e9884e"],[-.33,-.8,.69,"#ffa95b"],[.29,-.6,.7,"#ffbe68"]
+    ]) fireball(x+dx*radius,y+dy*radius,radius*size,color);
+    fireball(x,y-radius*.9,Math.max(1,radius*(1-phase)*.68),"#ffdf95");
+    for(let i=0;i<6;i++) {
+      const angle=-2.85+i*.49;
+      const spread=5+phase*(18+i%3*4);
+      box(x+Math.cos(angle)*spread,y+Math.sin(angle)*spread+6*phase*phase,2,2,"#f4b373");
+    }
+  }
+  function artillery() {
+    const age=elapsed-salvoStart;
+    if(age<0) return;
+    if(age>3.5) {
+      salvoStart=elapsed+between(15,30);
+      horizonX=between(.56,.86);
+      return;
+    }
+    const fall=.19;
+    for(let i=0;i<3;i++) {
+      const time=age-i*.57;
+      if(time<0 || time>fall+2.1) continue;
+      const x=Math.round(w*horizonX)+(i-1)*21;
+      const y=Math.round(h*.66)+[1,-3,2][i];
+      if(time>=fall) {
+        impact(x,y,time-fall);
+        continue;
+      }
+      const progress=time/fall;
+      const sx=x-18*(1-progress), sy=-5+(y+5)*progress;
+      poly([[sx-4,sy-22],[sx-2,sy-22],[sx+1,sy],[sx-1,sy]],"#e7b185");
+      poly([[sx-2,sy-8],[sx,sy-8],[sx+1,sy],[sx-1,sy]],"#fff0b9");
+    }
+  }
+  function draw() {
+    if(elapsed-passStart>=current.duration+.35) {
+      passStart=elapsed;
+      nextUnit();
+    }
+    ctx.drawImage(background,0,0);
+    artillery();
+    const progress=(elapsed-passStart)/current.duration;
+    const margin=Math.ceil(current.margin*spriteScale);
+    const x=-margin+(w+2*margin)*progress;
+    const y=current.altitude ? h*current.altitude : ground;
+    ctx.save();
+    ctx.translate(Math.round(x),Math.round(y));
+    ctx.scale(spriteScale,spriteScale);
+    current.draw(elapsed);
+    ctx.restore();
     ctx.drawImage(foreground,0,0);
   }
   function resize(){
