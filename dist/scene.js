@@ -161,13 +161,24 @@ function paintBadge(canvas, kind) {
   const canvas=document.getElementById("landscape");
   const ctx=canvas.getContext("2d");
   const {box,poly}=brush(ctx);
-  const motion=document.getElementById("motion");
   const preference=matchMedia("(prefers-reduced-motion: reduce)");
-  let moving=!preference.matches, elapsed=0, last=0, frame=0;
-  let background, foreground, w, h, ground, spriteScale;
+  let elapsed=0, last=0, frame=0;
+  let background, trees, foreground, w, h, ground, spriteScale;
   function layer(draw) {
     const layer=document.createElement("canvas");
     layer.width=w;layer.height=h;draw(brush(layer.getContext("2d")));return layer;
+  }
+  function fir({box,poly},x,y,height,color) {
+    box(x,y-height,2,height,color);
+    for(let j=1;j<=5;j++) {
+      const half=Math.floor(height*j*.043);
+      poly([[x+1,y-height+height*(j-1)*.16],[x+half+1,y-height+height*j*.18],
+            [x-half,y-height+height*j*.18]],color);
+    }
+  }
+  function nearTrees(paint) {
+    const r=noise(110);
+    for(let i=0;i<w;i+=4) fir(paint,i,h*.70+Math.sin(i*.021)*5,7+r()*17,"#535b63");
   }
   function terrain({box,poly}) {
     const r=noise(971);
@@ -189,12 +200,7 @@ function paintBadge(canvas, kind) {
       }
     }
     ridge(h*.48,h*.12,2,"#998291");ridge(h*.54,h*.10,2,"#7f7585");ridge(h*.61,h*.07,2,"#626574");
-    function fir(x,y,height,color) {
-      box(x,y-height,2,height,color);
-      for(let j=1;j<=5;j++){const half=Math.floor(height*j*.043);poly([[x+1,y-height+height*(j-1)*.16],[x+half+1,y-height+height*j*.18],[x-half,y-height+height*j*.18]],color)}
-    }
-    for(let i=0;i<w;i+=3) fir(i,h*.64+Math.sin(i*.04)*3,5+r()*12,"#666776");
-    for(let i=0;i<w;i+=4) fir(i,h*.70+Math.sin(i*.021)*5,7+r()*17,"#535b63");
+    for(let i=0;i<w;i+=3) fir({box,poly},i,h*.64+Math.sin(i*.04)*3,5+r()*12,"#666776");
     ridge(h*.68,h*.035,2,"#5b6263");ridge(h*.72,h*.04,2,"#444e55");
     box(0,ground-5,w,h-ground+5,"#56594f");
     for(let i=0;i<w*.8;i++)box(r()*w,ground-5+r()*12,1+r()*5,1,r()>.4?"#76705a":"#41474a");
@@ -360,12 +366,11 @@ function paintBadge(canvas, kind) {
     {name:"Czołg", draw:tank, duration:9, margin:76, exhaust:[-57,-19], muzzle:[71,-34]},
     {name:"Samolot wojskowy", draw:jet, duration:5, margin:46, altitude:.15},
     {name:"Rakieta", draw:rocket, duration:4, margin:42, altitude:.19},
-    {name:"BTR", draw:carrier, duration:8, margin:56, exhaust:[-52,-17], muzzle:[25,-34]},
+    {name:"BTR", draw:carrier, duration:8, margin:56, exhaust:[-52,-17], muzzle:[25,-34], burst:4},
     {name:"Shahed", draw:shahed, duration:7, margin:30, altitude:.15},
     {name:"Patrol pieszy", draw:footPatrol, duration:10, margin:45},
     ...additionalVehicles({box,poly},wheel)
   ];
-  const nameLabel = document.getElementById("unit-name");
   const between = (min,max) => min + Math.random()*(max-min);
   let remaining = [], current, passStart = 0, shotTime = Infinity;
   function nextUnit() {
@@ -377,7 +382,6 @@ function paintBadge(canvas, kind) {
     shotTime = current.muzzle
       ? current.duration*between(.32,.55)
       : Infinity;
-    nameLabel.textContent = current.name;
   }
   nextUnit();
   if (preference.matches) elapsed = current.duration*.64;
@@ -454,6 +458,105 @@ function paintBadge(canvas, kind) {
       poly([[sx-2,sy-8],[sx,sy-8],[sx+1,sy],[sx-1,sy]],"#fff0b9");
     }
   }
+  function newSkyPass(start) {
+    return {start, direction:Math.random()<.5 ? -1 : 1,
+      height:between(.12,.32), slope:between(-.065,.065), duration:between(.85,1.2)};
+  }
+  let skyPass=newSkyPass(between(3,7));
+  function skyTracers() {
+    const age=elapsed-skyPass.start;
+    if(age<0) return;
+    if(age>skyPass.duration+.6) {
+      skyPass=newSkyPass(elapsed+between(10,19));
+      return;
+    }
+    const direction=skyPass.direction;
+    for(let i=0;i<4;i++) {
+      const phase=(age-i*.16)/skyPass.duration;
+      if(phase<0 || phase>1) continue;
+      const travel=-26+phase*(w+52);
+      const x=direction===1 ? travel : w-travel;
+      const y=h*(skyPass.height+phase*skyPass.slope)+[0,4,-3,2][i];
+      ctx.save();
+      ctx.translate(Math.round(x),Math.round(y));
+      ctx.scale(direction,1);
+      const lift=-skyPass.slope*h*18/(w+52);
+      poly([[-21,lift],[-11,lift-1],[0,-1],[1,1],[-10,2+lift]],"#d59c76");
+      box(-6,-1,6,2,"#ffe8bb");
+      box(0,-1,3,2,"#faf1ce");
+      ctx.restore();
+    }
+  }
+
+  function distantFire() {
+    // Smoke hangs above the fire while brighter individual tongues rise from the ridge.
+    const x=Math.round(w*.73), y=Math.round(h*.61);
+    ctx.save();
+    for(let i=0;i<10;i++) {
+      const rise=(elapsed*.17+i*.1)%1;
+      const drift=rise*rise*17+Math.sin(i*3+rise*4)*3;
+      ctx.globalAlpha=.40*(1-rise);
+      fireball(x+drift+(i%3-1)*5,y-5-rise*43,3+rise*6,"#5c5864");
+    }
+    ctx.globalAlpha=1;
+    for(let i=0;i<7;i++) {
+      const fx=x+(i-3)*3;
+      const size=4+5*Math.sin((i+1)*.39)+3*Math.sin(elapsed*3+i*1.7);
+      const lean=Math.sin(elapsed*2+i)*2;
+      poly([[fx-3,y],[fx-3,y-size*.5],[fx+lean,y-size],[fx+lean+2,y-size*.45],[fx+4,y]],"#d77c55");
+      poly([[fx-2,y],[fx,y-size*.6],[fx+2,y-2],[fx+2,y]],"#f5b968");
+    }
+    for(let i=0;i<5;i++){
+      const rise=(elapsed*.37+i*.2)%1;
+      ctx.globalAlpha=1-rise;
+      box(x+(i-2)*4+rise*7,y-4-rise*22,1,2,"#ffd996");
+    }
+    ctx.restore();
+  }
+
+  function trenchCrew() {
+    const roles=["pipe","cloth","map"];
+    roles.forEach((role,i)=>{
+      const x=Math.round(w*[.24,.51,w<250 ? .73 : .80][i]), y=h-3;
+      const scale=Math.min(spriteScale,h*.14/26);
+      ctx.save();
+      ctx.translate(x,y);
+      ctx.scale(scale,scale);
+      if(i===1) ctx.scale(-1,1);
+      const coat=["#79816c","#727e70","#868570"][i];
+      // Low seat, bent legs and boots; each small silhouette faces into the trench.
+      box(-6,-8,10,2,"#75675b");box(-5,-6,2,6,"#423d40");
+      poly([[-5,-11],[3,-11],[10,-8],[8,-2],[5,-2],[5,-6],[-4,-6]],"#505854");
+      poly([[-4,-10],[1,-10],[6,-7],[4,-1],[1,-1],[2,-6],[-5,-7]],"#676e61");
+      box(1,-2,5,2,"#34383b");box(6,-3,6,2,"#35383b");
+      poly([[-5,-20],[1,-21],[4,-18],[4,-12],[2,-9],[-6,-9],[-7,-12]],coat);
+      box(-3,-25,7,6,"#c3a186");box(3,-23,2,2,"#e3c1a1");
+      box(-4,-27,6,2,coat);box(-5,-26,9,3,coat);box(-6,-24,11,1,"#444f49");
+      if(role==="pipe") {
+        const lift=(1+Math.sin(elapsed*1.4))*.5;
+        const hand=-16-lift*4;
+        poly([[-3,-18],[0,-17],[2,-15],[5,hand],[7,hand+1],[3,-12],[0,-12]],"#929784");
+        box(5,hand,3,2,"#d2ac89");box(6,hand-1,5,1,"#3d3836");box(10,hand-3,3,3,"#895e49");
+        for(let j=0;j<3;j++){
+          const rise=(elapsed*.46+j/3)%1;
+          ctx.globalAlpha=.65*(1-rise);
+          fireball(11+rise*4+Math.sin(rise*6),hand-4-rise*10,1+rise,"#d7cbbc");
+        }
+        ctx.globalAlpha=1;
+      } else if(role==="cloth") {
+        box(-6,-14,8,3,"#846c56");box(1,-14,11,2,"#424948");box(10,-14,8,1,"#aaa899");
+        const hand=4+Math.sin(elapsed*3)*3;
+        poly([[-3,-18],[0,-18],[hand,-15],[hand,-13],[0,-14]],"#9b9c87");
+        box(hand,-15,4,3,"#ded1ac");box(-1,-14,3,2,"#c5a689");
+      } else {
+        const tilt=Math.round(Math.sin(elapsed*1.7));
+        poly([[1,-17],[7,-19],[12,-17+tilt],[17,-19+tilt],[16,-11],[11,-9],[6,-11],[2,-10]],"#dcc99a");
+        box(6,-17,1,6,"#a59a7d");box(11,-16+tilt,1,6,"#a59a7d");
+        box(2,-14,3,2,"#be9a78");box(14,-14+tilt,3,2,"#be9a78");
+      }
+      ctx.restore();
+    });
+  }
   function exhaustTrail([pipeX,pipeY],age,speed) {
     const interval=.17, lifetime=1.25;
     const newest=Math.floor(age/interval);
@@ -499,6 +602,9 @@ function paintBadge(canvas, kind) {
       nextUnit();
     }
     ctx.drawImage(background,0,0);
+    distantFire();
+    ctx.drawImage(trees,0,0);
+    skyTracers();
     artillery();
     const age=elapsed-passStart;
     const progress=age/current.duration;
@@ -511,9 +617,14 @@ function paintBadge(canvas, kind) {
     const speed=(w+2*margin)/(spriteScale*current.duration);
     if(current.exhaust) exhaustTrail(current.exhaust,age,speed);
     current.draw(elapsed);
-    if(current.muzzle) gunshot(current.muzzle,age-shotTime,speed);
+    if(current.muzzle) {
+      for(let i=0;i<(current.burst ?? 1);i++) {
+        gunshot(current.muzzle,age-shotTime-i*.26,speed);
+      }
+    }
     ctx.restore();
     ctx.drawImage(foreground,0,0);
+    trenchCrew();
   }
   function resize(){
     const bounds=canvas.getBoundingClientRect();
@@ -521,7 +632,7 @@ function paintBadge(canvas, kind) {
     h=canvas.height=Math.round(bounds.height/2);
     ground=Math.round(h*.79);
     spriteScale=w<250 ? .75 : 1;
-    background=layer(terrain);foreground=layer(trench);draw();
+    background=layer(terrain);trees=layer(nearTrees);foreground=layer(trench);draw();
   }
   function tick(time) {
     if(last)elapsed+=Math.min(.1,(time-last)/1000);
@@ -529,12 +640,9 @@ function paintBadge(canvas, kind) {
   }
   function updateMotion(){
     cancelAnimationFrame(frame); last=0;
-    const label=moving?"Wstrzymaj animację":"Wznów animację";
-    motion.textContent=moving?"Ⅱ":"▶";motion.title=label;motion.setAttribute("aria-label",label);
-    if(moving&&!document.hidden)frame=requestAnimationFrame(tick);
+    if(!preference.matches&&!document.hidden)frame=requestAnimationFrame(tick);
   }
-  motion.onclick=()=>{moving=!moving;updateMotion()};
-  preference.addEventListener("change",()=>{moving=!preference.matches;updateMotion()});
+  preference.addEventListener("change",updateMotion);
   document.addEventListener("visibilitychange",updateMotion);
   resize();new ResizeObserver(resize).observe(canvas);updateMotion();
 })();

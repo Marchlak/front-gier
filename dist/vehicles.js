@@ -73,7 +73,7 @@ function additionalVehicles({box, poly}, wheel) {
   }
 
   return [
-    {name:"Ka-52",draw:helicopter,duration:7,margin:52,altitude:.19,muzzle:[35,5]},
+    {name:"Ka-52",draw:helicopter,duration:7,margin:52,altitude:.19,muzzle:[35,5],burst:4},
     {name:"Tu-95",draw:bomber,duration:6,margin:58,altitude:.16},
     {name:"RMMV HX 8×8",draw:truck,duration:8,margin:55,exhaust:[-50,-13]},
     {name:"Bv410",draw:articulated,duration:8,margin:49,exhaust:[-45,-15]},
