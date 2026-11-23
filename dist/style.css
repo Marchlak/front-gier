@@ -1,0 +1,47 @@
+*{box-sizing:border-box}
+:root{color-scheme:dark;--bg:#181825;--paper:#f2ede4;--muted:#bac2ce;--peach:#fab387;--line:#41414c;--mono:"IBM Plex Mono","DejaVu Sans Mono",monospace}
+body{margin:0;color:var(--paper);background:radial-gradient(ellipse at 80% 0,#292934,transparent 55%),var(--bg);min-height:100vh;font-family:"Barlow","DejaVu Sans",sans-serif}
+main{max-width:1410px;margin:auto;padding:0 clamp(16px,5vw,80px) 40px}
+header,.section-head{display:flex;align-items:center;justify-content:space-between;gap:16px}
+header{height:80px}
+.brand{display:flex;gap:13px;align-items:center;font-size:1.05rem;font-weight:900;letter-spacing:.115em}
+.insignia{width:33px;height:34px;position:relative;display:block}
+.insignia i{position:absolute;width:100%;height:14px;top:4px;background:var(--peach);clip-path:polygon(0 53%,50% 0,100% 53%,100% 100%,50% 50%,0 100%)}
+.insignia i+i{top:16px}
+time,.progress,.status,.domain,.hint{font-family:var(--mono)}
+time{font-size:.85rem;color:var(--muted);text-align:right}
+.hero{position:relative;isolation:isolate;height:clamp(335px,32vw,435px);overflow:hidden;background:#575767;border:1px solid #57515a}
+canvas{image-rendering:pixelated}
+#landscape,.shade{position:absolute;inset:0;width:100%;height:100%}
+.shade{background:linear-gradient(90deg,rgba(19,19,31,.79),rgba(19,19,31,.64) 22%,transparent 58%)}
+.intro{position:absolute;left:clamp(22px,4.4vw,70px);top:47%;transform:translateY(-50%)}
+h1,h2,h3,p{margin:0}
+h1{font-family:"Barlow Condensed","DejaVu Sans",sans-serif;font-size:clamp(3.5rem,6.5vw,6.6rem);font-weight:900;line-height:.91;letter-spacing:-.085em;text-shadow:0 2px 0 #312935}
+h1 em{font-style:normal;color:var(--peach)}
+.intro p{margin-top:20px;color:#faf0e4;font-size:1rem}
+button{cursor:pointer}
+#motion{position:absolute;right:12px;bottom:12px;width:42px;height:42px;border:1px solid #83828c;color:var(--paper);background:#181825dc;font:700 1rem var(--mono);border-radius:2px}
+.games{margin-top:clamp(28px,3.5vw,50px)}
+.section-head{margin-bottom:18px}
+h2{font-size:clamp(1.6rem,2.5vw,2.25rem);letter-spacing:-.065em}
+.progress,.status{display:flex;align-items:center;gap:10px;font-size:.875rem}
+.progress{color:var(--muted)}
+#segments{display:flex;gap:3px}
+#segments i{width:15px;height:9px;background:#444453;transform:skew(-12deg)}
+#segments i.filled{background:#a6e3a1}
+#cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.card{display:grid;grid-template-columns:clamp(92px,9.7vw,145px) minmax(0,1fr);align-items:stretch;gap:22px;color:inherit;text-decoration:none;background:#242431;border:1px solid var(--line);padding:12px;transition:transform .16s,border-color .16s,background .16s}
+.card:hover{transform:translateY(-3px);border-color:var(--peach);background:#2c2b37}
+.card:focus-visible,button:focus-visible{outline:3px solid var(--peach);outline-offset:3px}
+.card canvas{width:100%;height:100%;min-height:104px;object-fit:cover;border:1px solid #ffffff18}
+.info{padding:8px 0;display:flex;flex-direction:column;align-items:flex-start;justify-content:center}
+.domain{color:var(--muted);font-size:.8125rem}
+h3{font-size:clamp(1.22rem,1.8vw,1.65rem);letter-spacing:-.055em;margin:4px 0 14px}
+.status{color:#c9c6d0;gap:7px}
+.status:before{content:"";display:grid;place-content:center;border:1px solid #9995a3;width:12px;height:12px;font:700 11px sans-serif}
+.done .status{color:#a6e3a1}
+.done .status:before{content:"✓";background:#a6e3a1;color:#181825;border-color:#a6e3a1}
+.hint,#storage-warning{margin-top:18px;color:var(--muted);font-size:.875rem;line-height:1.6}
+@media(max-width:700px){header{height:64px}.brand{font-size:.9rem}.hero{height:340px}.intro{top:31%}.intro p{margin-top:14px;font-size:.92rem}.shade{background:linear-gradient(105deg,#17172686,transparent 76%)}#cards{grid-template-columns:1fr;gap:10px}.card{grid-template-columns:93px 1fr;gap:16px}.card canvas{min-height:88px}.info{padding:0}h3{margin-bottom:10px}.progress{gap:7px}.section-head{gap:7px}time{max-width:135px}.hint{font-size:.81rem}}
+@media(max-width:370px){main{padding-inline:12px}.progress #segments{display:none}}
+@media(prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}

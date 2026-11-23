@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#181825">
+  <title>Front Gier — codzienny patrol</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="scene.js"></script>
+  <script defer src="patrol.js"></script>
+</head>
+<body>
+  <main>
+    <header>
+      <div class="brand"><span class="insignia" aria-hidden="true"><i></i><i></i></span> FRONT GIER</div>
+      <time id="date"></time>
+    </header>
+    <section class="hero" aria-labelledby="title">
+      <canvas id="landscape" role="img" aria-label="Pikselowy czołg jedzie wzdłuż okopów na tle gór o zachodzie słońca."></canvas>
+      <div class="shade"></div>
+      <div class="intro"><h1 id="title">Codzienny<br><em>patrol.</em></h1>
+      <p>Wasze minigry w jednym miejscu.</p></div>
+      <button id="motion" type="button" aria-label="Wstrzymaj animację" title="Wstrzymaj animację">Ⅱ</button>
+    </section>
+    <section aria-labelledby="games-title" class="games">
+      <div class="section-head"><h2 id="games-title">Dzisiejsze gry</h2><div class="progress" role="status"><span id="count"></span><span id="segments" aria-hidden="true"></span></div></div>
+      <div id="cards"></div>
+      <p class="hint">Kliknij grę, żeby zagrać i oznaczyć ją jako zrobioną na dziś.</p>
+      <p id="storage-warning" hidden>Przeglądarka blokuje zapis. Postęp będzie widoczny do zamknięcia tej strony.</p>
+    </section>
+  </main>
+</body>
+</html>
