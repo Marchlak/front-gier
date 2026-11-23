@@ -187,8 +187,12 @@ function paintBadge(canvas, kind) {
   const ctx=canvas.getContext("2d");
   const {box,poly}=brush(ctx);
   const preference=matchMedia("(prefers-reduced-motion: reduce)");
-  let elapsed=0, last=0, frame=0;
+  let elapsed=0, last=0, frame=0, visible=true;
   let background, ruins, foreground, w, h, ground, spriteScale;
+  // The backing store is twice the art grid, so moving sprites can advance in
+  // half-pixel steps; whole-pixel snapping made each pass judder unevenly.
+  const detail=2;
+  const snap=value=>Math.round(value*detail)/detail;
   function layer(draw) {
     const layer=document.createElement("canvas");
     layer.width=w;layer.height=h;draw(brush(layer.getContext("2d")));return layer;
@@ -605,7 +609,7 @@ function paintBadge(canvas, kind) {
       const x=shot.direction===1 ? travel : w-travel;
       const y=h*(shot.height+phase*shot.slope);
       ctx.save();
-      ctx.translate(Math.round(x),Math.round(y));
+      ctx.translate(snap(x),snap(y));
       ctx.scale(shot.direction*size,size);
       const lift=-shot.slope*h*21/span;
       poly([[-21,lift],[-11,lift*.5-1],[0,-1],[1,1],[-10,lift*.5+2]],tail);
@@ -766,6 +770,8 @@ function paintBadge(canvas, kind) {
       nextUnit();
     }
     if(elapsed>skyPass.end) skyPass=newSkyPass(elapsed+between(10,19));
+    ctx.setTransform(detail,0,0,detail,0,0);
+    ctx.imageSmoothingEnabled=false;
     ctx.drawImage(background,0,0);
     skyTracers("far");
     distantFire();
@@ -778,7 +784,7 @@ function paintBadge(canvas, kind) {
     const x=-margin+(w+2*margin)*progress;
     const y=current.altitude ? h*current.altitude : ground;
     ctx.save();
-    ctx.translate(Math.round(x),Math.round(y));
+    ctx.translate(snap(x),snap(y));
     ctx.scale(spriteScale,spriteScale);
     const speed=(w+2*margin)/(spriteScale*current.duration);
     if(current.exhaust) exhaustTrail(current.exhaust,age,speed);
@@ -795,8 +801,9 @@ function paintBadge(canvas, kind) {
   }
   function resize(){
     const bounds=canvas.getBoundingClientRect();
-    w=canvas.width=Math.max(180,Math.round(bounds.width/2));
-    h=canvas.height=Math.round(bounds.height/2);
+    w=Math.max(180,Math.round(bounds.width/2));
+    h=Math.round(bounds.height/2);
+    canvas.width=w*detail;canvas.height=h*detail;
     ground=Math.round(h*.79);
     spriteScale=w<250 ? .75 : 1;
     background=layer(terrain);ruins=layer(burntVillage);foreground=layer(trench);draw();
@@ -807,8 +814,10 @@ function paintBadge(canvas, kind) {
   }
   function updateMotion(){
     cancelAnimationFrame(frame); last=0;
-    if(!preference.matches&&!document.hidden)frame=requestAnimationFrame(tick);
+    if(visible&&!preference.matches&&!document.hidden)frame=requestAnimationFrame(tick);
   }
+  // Pause the scene while it is scrolled out of view.
+  new IntersectionObserver(([entry])=>{visible=entry.isIntersecting;updateMotion()}).observe(canvas);
   preference.addEventListener("change",updateMotion);
   document.addEventListener("visibilitychange",updateMotion);
   resize();new ResizeObserver(resize).observe(canvas);updateMotion();
