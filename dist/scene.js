@@ -57,23 +57,23 @@ function paintBadge(canvas, kind) {
   const {box,poly}=brush(ctx);
   const motion=document.getElementById("motion");
   const preference=matchMedia("(prefers-reduced-motion: reduce)");
-  let moving=!preference.matches, elapsed=0, last=0, frame=0;
-  let background, foreground, w, h, ground, center;
+  let moving=!preference.matches, elapsed=preference.matches ? 4 : 0, last=0, frame=0;
+  let background, foreground, w, h, ground, spriteScale;
   function layer(draw) {
     const layer=document.createElement("canvas");
     layer.width=w;layer.height=h;draw(brush(layer.getContext("2d")));return layer;
   }
   function terrain({box,poly}) {
-    const r=noise(971), sky=["#625d79","#86748a","#ab8390","#cb9492","#dfa691","#efb994","#f4c89e"];
-    sky.forEach((c,i)=>box(0,i*h*.64/sky.length,w,h*.64/sky.length+1,c));
+    const r=noise(971);
+    const sky=ctx.createLinearGradient(0,0,0,h*.65);
+    sky.addColorStop(0,"#625d79");
+    sky.addColorStop(.46,"#bb8991");
+    sky.addColorStop(1,"#f4c89e");
+    box(0,0,w,h,sky);
     const sunX=Math.round(w*.79),sunY=Math.round(h*.31),radius=19;
     for(let dy=-radius;dy<=radius;dy++){
       const dx=Math.floor(Math.sqrt(radius*radius-dy*dy));
       box(sunX-dx,sunY+dy,dx*2+1,1,"#ffe4ab");
-    }
-    for(let i=0;i<65;i++) {
-      const x=r()*w,y=r()*h*.43;
-      box(x,y,6+r()*40,1,r()>.5?"#f5c4a270":"#a1849260");
     }
     function ridge(base,amplitude,step,color) {
       let previous=base;
@@ -121,17 +121,27 @@ function paintBadge(canvas, kind) {
       if(r()<.12)poly([[x,y+1],[x-2,y-5-r()*3],[x+2,y]],"#31333a");
     }
   }
-  function tank(x,y,t) {
-    ctx.save();ctx.translate(Math.round(x),Math.round(y));
-    box(-54,0,103,2,"#41454a");
-    poly([[-52,-12],[-47,-19],[42,-19],[50,-12],[43,-3],[36,0],[-39,0],[-48,-4]],"#2d333b");
-    poly([[-48,-12],[-44,-16],[40,-16],[45,-12],[38,-4],[-38,-4]],"#535753");
-    for(let i=0;i<6;i++){
-      const cx=-37+i*14;box(cx-5,-14,10,9,"#343a3d");box(cx-3,-14,6,8,"#78776a");
-      box(cx-4,-12,8,4,"#686b60");box(cx-1,-11,3,3,"#393f42");
+  function wheel(cx,cy,radius,angle,rim,hub) {
+    ctx.save();
+    ctx.translate(cx,cy);
+    const r=radius, edge=Math.round(r*.56);
+    poly([[-edge,-r],[edge,-r],[r,-edge],[r,edge],[edge,r],[-edge,r],[-r,edge],[-r,-edge]],"#30343a");
+    const inner=r-2;
+    poly([[-edge,-inner],[edge,-inner],[inner,-edge],[inner,edge],[edge,inner],[-edge,inner],[-inner,edge],[-inner,-edge]],rim);
+    for(let spoke=0;spoke<3;spoke++) {
+      const a=angle+spoke*Math.PI*2/3;
+      box(Math.cos(a)*(r-3),Math.sin(a)*(r-3),2,2,"#424945");
     }
-    for(let i=0;i<17;i++){const xx=-39+((i*5+Math.floor(t*12))%83);box(xx,-2,3,1,"#929084")}
-    const bob=Math.floor(t*3)%5===0?-1:0;ctx.translate(0,bob);
+    box(-1,-1,3,3,hub);
+    ctx.restore();
+  }
+  function tank(t) {
+    box(-54,0,103,2,"#41454a");
+    poly([[-53,-14],[-47,-20],[43,-20],[50,-14],[44,-5],[36,0],[-39,0],[-49,-5]],"#292e34");
+    poly([[-49,-13],[-44,-17],[40,-17],[46,-13],[39,-5],[34,-3],[-37,-3],[-46,-7]],"#61655c");
+    for(let i=0;i<6;i++) wheel(-37+i*14,-10,7,t*4,"#818474","#b3ab8c");
+    ctx.save();
+    ctx.translate(0,Math.floor(t*3)%5===0?-1:0);
     poly([[-56,-18],[-46,-25],[-35,-27],[31,-28],[47,-22],[52,-16],[49,-13],[-53,-13]],"#454d48");
     poly([[-51,-21],[-40,-26],[31,-27],[44,-22],[35,-20],[-52,-17]],"#83907a");
     box(-51,-16,99,2,"#aca58a");
@@ -145,23 +155,133 @@ function paintBadge(canvas, kind) {
     poly([[-15,-37],[-20,-58],[-19,-58],[-14,-37]],"#484d52");
     ctx.restore();
   }
+  function carrier(t) {
+    // Four exposed wheels and a low, sloping hull distinguish the BTR from the tank.
+    poly([[-50,-22],[-40,-30],[22,-30],[41,-24],[53,-16],[47,-9],[-41,-9],[-51,-14]],"#47534d");
+    poly([[-49,-22],[-38,-28],[22,-28],[42,-22],[31,-19],[-45,-19]],"#879179");
+    poly([[-42,-18],[32,-18],[48,-21],[43,-13],[-39,-13]],"#6b7963");
+    poly([[19,-28],[26,-26],[31,-23],[21,-24]],"#323f43");
+    box(-33,-24,14,2,"#48544f");
+    box(-15,-23,8,3,"#39474a");
+    box(-3,-23,8,3,"#39474a");
+    box(10,-22,2,8,"#b4a98a");
+    poly([[-8,-30],[-4,-36],[6,-37],[13,-32],[11,-29]],"#596956");
+    box(6,-35,19,2,"#555e53");
+    box(46,-19,4,2,"#f7d69b");
+    for(const x of [-36,-14,12,35]) wheel(x,-8,9,t*4,"#727968","#c6b799");
+  }
+  function jet() {
+    // Banked wings, twin exhausts and a glass canopy.
+    poly([[-18,-3],[-33,-22],[-26,-22],[-7,-10],[9,-4]],"#727b89");
+    poly([[-28,-4],[-38,-18],[-32,-18],[-19,-7]],"#454c5b");
+    poly([[-35,-5],[-8,-6],[7,-8],[17,-6],[30,-1],[43,1],[25,5],[-23,5],[-35,2]],"#58616d");
+    poly([[-29,-4],[-9,-5],[8,-7],[29,0],[7,0]],"#a4a5a1");
+    poly([[6,-7],[13,-10],[18,-9],[24,-4],[17,-4]],"#4d6575");
+    box(13,-9,5,1,"#c2d8d9");
+    poly([[9,1],[-15,18],[-28,18],[-16,4],[-9,1]],"#677485");
+    poly([[6,2],[-16,16],[-23,16],[-12,6]],"#858e99");
+    poly([[-24,2],[-37,10],[-42,10],[-35,2]],"#4c5665");
+    box(-37,-3,5,3,"#343d49");box(-37,1,5,2,"#343d49");
+  }
+  function rocket(t) {
+    const flame=Math.floor(t*9)%3;
+    poly([[-23,-4],[-33-flame*2,0],[-25,1],[-30,4],[-21,3]],"#efa276");
+    poly([[-22,-2],[-29-flame,0],[-22,2]],"#ffe3a2");
+    poly([[-18,-4],[-24,-11],[-18,-11],[-6,-4]],"#666f6d");
+    poly([[-22,-4],[13,-4],[25,0],[13,4],[-22,4]],"#d2c6b2");
+    poly([[-21,1],[21,1],[13,4],[-21,4]],"#91918a");
+    poly([[13,-4],[25,0],[17,2],[12,1]],"#625f66");
+    poly([[-18,3],[-24,12],[-18,12],[-7,4]],"#656d70");
+    box(-21,-4,3,8,"#4a5056");box(6,-4,3,7,"#9b726a");
+  }
+  function shahed(t) {
+    // The delta planform is seen from above; the propeller sits at the back.
+    poly([[25,0],[-23,-16],[-20,-5],[-13,0],[-20,6],[-23,16]],"#61645e");
+    poly([[22,0],[-21,-14],[-18,-5],[-10,-1]],"#c4b69b");
+    poly([[22,0],[-21,14],[-18,5],[-10,1]],"#9e9988");
+    poly([[-17,-3],[13,-3],[27,0],[13,3],[-17,3]],"#dbceb5");
+    box(-21,-2,5,4,"#515452");
+    const blade=Math.floor(t*14)%2 ? 5 : 2;
+    box(-23,-blade,2,2*blade+1,"#474a4d");
+    box(-22,-15,3,3,"#555759");box(-22,12,3,3,"#555759");
+  }
+
+  const uniforms = [
+    {coat:"#667563", pack:"#50594c", helmet:"#89927a"},
+    {coat:"#777661", pack:"#57594d", helmet:"#96917a"},
+    {coat:"#64716b", pack:"#4e5753", helmet:"#818e80"}
+  ];
+
+  function leg(phase, color) {
+    const step = Math.sin(phase);
+    const lift = Math.max(0, Math.cos(phase));
+    const knee = Math.round(step * 2 + lift * 3);
+    const boot = Math.round(step * 6);
+    const sole = -Math.round(lift * 3);
+    poly([[-2,-12],[2,-12],[knee+2,-7],[boot+1,sole-2],
+          [boot-2,sole-2],[knee-2,-7]],color);
+    box(boot-2,sole-3,4,3,"#383b39");
+    box(boot-2,sole-1,6,1,"#303437");
+  }
+
+  function footPatrol(t) {
+    uniforms.forEach((uniform, i) => {
+      const phase = t * 7.5 + i * 2.3;
+      ctx.save();
+      ctx.translate([-33,0,28][i], i === 1 ? -1 : 0);
+      leg(phase + Math.PI, "#414b45");
+      leg(phase, uniform.coat);
+      ctx.translate(0,-Math.round(Math.abs(Math.sin(phase))));
+      // Pack, coat, face in profile and a helmet with a short brim.
+      box(-7,-21,5,9,uniform.pack);
+      box(-7,-20,2,6,"#899079");
+      poly([[-3,-22],[2,-22],[5,-18],[3,-11],[-4,-11],[-3,-16]],uniform.coat);
+      box(-4,-13,8,2,"#4b5047");
+      box(-1,-27,5,6,"#c4a385");
+      box(3,-25,2,2,"#d5b494");
+      box(-3,-29,6,2,uniform.helmet);
+      box(-4,-28,9,3,uniform.helmet);
+      box(-4,-26,10,1,"#4d554e");
+      const swing = Math.round(Math.sin(phase) * 3);
+      poly([[-2,-21],[1,-21],[2+swing,-17],[4+swing,-16],[3+swing,-14],
+            [swing-1,-16]],uniform.pack);
+      box(3+swing,-16,2,2,"#c4a385");
+      ctx.restore();
+    });
+  }
+
+  // Times are seconds in a repeating patrol. The margin includes the whole sprite.
+  const passes=[
+    {draw:tank,    start:0,    duration:10,  margin:76, altitude:0},
+    {draw:jet,     start:1,    duration:5,   margin:46, altitude:.15},
+    {draw:rocket,  start:7,    duration:3.8, margin:42, altitude:.19},
+    {draw:carrier, start:10.7, duration:10,  margin:56, altitude:0},
+    {draw:shahed,  start:13.2, duration:8,   margin:30, altitude:.15},
+    {draw:footPatrol, start:21.4, duration:12, margin:45, altitude:0}
+  ];
   function draw() {
     ctx.drawImage(background,0,0);
-    const x=center+Math.sin(elapsed*.20)*w*.052;
-    for(let j=0;j<7;j++){
-      const phase=(elapsed*.32+j/7)%1;
-      ctx.globalAlpha=(1-phase)*.45;
-      const size=3+phase*9;
-      box(x-48-phase*44,ground-11-phase*13+Math.sin(j*5)*2,size,size*.55,"#b9a28b");
+    const time=elapsed%34;
+    for(const pass of passes) {
+      const progress=(time-pass.start)/pass.duration;
+      if(progress<0 || progress>1) continue;
+      const margin=Math.ceil(pass.margin*spriteScale);
+      const x=-margin+(w+2*margin)*progress;
+      const y=pass.altitude ? h*pass.altitude : ground;
+      ctx.save();
+      ctx.translate(Math.round(x),Math.round(y));
+      ctx.scale(spriteScale,spriteScale);
+      pass.draw(elapsed);
+      ctx.restore();
     }
-    ctx.globalAlpha=1;tank(x,ground,elapsed);ctx.drawImage(foreground,0,0);
+    ctx.drawImage(foreground,0,0);
   }
   function resize(){
     const bounds=canvas.getBoundingClientRect();
     w=canvas.width=Math.max(180,Math.round(bounds.width/2));
     h=canvas.height=Math.round(bounds.height/2);
     ground=Math.round(h*.79);
-    center=Math.min(w*(bounds.width<540?.62:.71),w-73);
+    spriteScale=w<250 ? .75 : 1;
     background=layer(terrain);foreground=layer(trench);draw();
   }
   function tick(time) {
