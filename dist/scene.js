@@ -566,35 +566,47 @@ function paintBadge(canvas, kind) {
     middle: {size:1, duration:1.00, altitude:[.23,.50], tail:"#d39c77", core:"#ffe1ae"},
     near: {size:1.55, duration:.67, altitude:[.14,.70], tail:"#e89e64", core:"#fff2c7"}
   };
-  function newSkyPass(start,direction) {
-    const order=["far","middle","near","middle"];
+  function newSkyPass(start) {
+    const depths=Object.keys(tracerPlanes);
+    const order=depths.slice();
+    const count=Math.floor(between(3,9));
+    while(order.length<count) order.push(depths[Math.floor(Math.random()*depths.length)]);
     for(let i=order.length-1;i>0;i--){
       const j=Math.floor(Math.random()*(i+1));
       [order[i],order[j]]=[order[j],order[i]];
     }
+
+    const leadDirection=Math.random()<.5 ? -1 : 1;
+    const turnAt=Math.random()<.4 ? Math.floor(between(1,count)) : count;
+    let delay=0;
     const shots=order.map((depth,i)=>{
       const plane=tracerPlanes[depth];
-      return {depth,plane,delay:i*.16,height:between(...plane.altitude),slope:between(-.06,.06)};
+      if(i>0) delay+=Math.random()<.22 ? between(.35,.72) : between(.08,.24);
+      return {
+        depth,plane,delay,direction:i<turnAt ? leadDirection : -leadDirection,
+        duration:plane.duration*between(.88,1.12),
+        height:between(...plane.altitude),slope:between(-.06,.06)
+      };
     });
-    const end=start+Math.max(...shots.map(shot=>shot.delay+shot.plane.duration));
-    return {start,end,direction,shots};
+    const end=start+Math.max(...shots.map(shot=>shot.delay+shot.duration));
+    return {start,end,shots};
   }
-  let skyPass=newSkyPass(between(3,7),Math.random()<.5 ? -1 : 1);
+  let skyPass=newSkyPass(between(3,7));
   function skyTracers(depth) {
     const age=elapsed-skyPass.start;
     if(age<0 || elapsed>skyPass.end) return;
     for(const shot of skyPass.shots) {
       if(shot.depth!==depth) continue;
-      const {size,duration,tail,core}=shot.plane;
-      const phase=(age-shot.delay)/duration;
+      const {size,tail,core}=shot.plane;
+      const phase=(age-shot.delay)/shot.duration;
       if(phase<0 || phase>1) continue;
       const margin=Math.ceil(25*size), span=w+2*margin;
       const travel=phase*span-margin;
-      const x=skyPass.direction===1 ? travel : w-travel;
+      const x=shot.direction===1 ? travel : w-travel;
       const y=h*(shot.height+phase*shot.slope);
       ctx.save();
       ctx.translate(Math.round(x),Math.round(y));
-      ctx.scale(skyPass.direction*size,size);
+      ctx.scale(shot.direction*size,size);
       const lift=-shot.slope*h*21/span;
       poly([[-21,lift],[-11,lift*.5-1],[0,-1],[1,1],[-10,lift*.5+2]],tail);
       box(-5,-1,8,2,core);
@@ -753,7 +765,7 @@ function paintBadge(canvas, kind) {
       passStart=elapsed;
       nextUnit();
     }
-    if(elapsed>skyPass.end) skyPass=newSkyPass(elapsed+between(10,19),-skyPass.direction);
+    if(elapsed>skyPass.end) skyPass=newSkyPass(elapsed+between(10,19));
     ctx.drawImage(background,0,0);
     skyTracers("far");
     distantFire();
