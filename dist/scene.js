@@ -184,55 +184,132 @@ function paintBadge(canvas, kind) {
   const {box,poly}=brush(ctx);
   const preference=matchMedia("(prefers-reduced-motion: reduce)");
   let elapsed=0, last=0, frame=0;
-  let background, trees, foreground, w, h, ground, spriteScale;
+  let background, ruins, foreground, w, h, ground, spriteScale;
   function layer(draw) {
     const layer=document.createElement("canvas");
     layer.width=w;layer.height=h;draw(brush(layer.getContext("2d")));return layer;
   }
-  function fir({box,poly},x,y,height,color) {
-    box(x,y-height,2,height,color);
-    for(let j=1;j<=5;j++) {
-      const half=Math.floor(height*j*.043);
-      poly([[x+1,y-height+height*(j-1)*.16],[x+half+1,y-height+height*j*.18],
-            [x-half,y-height+height*j*.18]],color);
+  const burnSites=[
+    {x:.14,y:.55,size:.54,phase:.19},
+    {x:.49,y:.595,size:.78,phase:.64},
+    {x:.79,y:.63,size:1.08,phase:.02}
+  ];
+  function siteScale(site) {
+    return site.size*Math.min(1,h/196,w/315);
+  }
+  function snag({box,poly},x,y,size,tone,lean) {
+    const top=x+lean*size*.22;
+    poly([[x-2,y],[x+1,y],[top+1,y-size*.74],[top-1,y-size],[top-2,y-size*.75]],tone);
+    for(let k=0;k<3;k++){
+      const sign=k%2 ? 1 : -1;
+      const bx=x+(top-x)*(.30+k*.20), by=y-size*(.32+k*.20);
+      poly([[bx-1,by+1],[bx+1,by],[bx+sign*size*.21,by-size*.13],
+            [bx+sign*size*.25,by-size*.28],[bx+sign*size*.18,by-size*.15]],tone);
     }
+    box(x-2,y-1,5,2,tone);
   }
-  function nearTrees(paint) {
-    const r=noise(110);
-    for(let i=0;i<w;i+=4) fir(paint,i,h*.70+Math.sin(i*.021)*5,7+r()*17,"#535b63");
-  }
-  function terrain({box,poly}) {
-    const r=noise(971);
+  function terrain(paint) {
+    const {box,poly}=paint, r=noise(971);
     const sky=ctx.createLinearGradient(0,0,0,h*.65);
-    sky.addColorStop(0,"#625d79");
-    sky.addColorStop(.46,"#bb8991");
-    sky.addColorStop(1,"#f4c89e");
+    sky.addColorStop(0,"#42414e");
+    sky.addColorStop(.48,"#797077");
+    sky.addColorStop(.78,"#a5887e");
+    sky.addColorStop(1,"#bda08a");
     box(0,0,w,h,sky);
-    const sunX=Math.round(w*.79),sunY=Math.round(h*.31),radius=19;
+    const sunX=Math.round(w*.78), sunY=Math.round(h*.29), radius=Math.round(h*.072);
     for(let dy=-radius;dy<=radius;dy++){
       const dx=Math.floor(Math.sqrt(radius*radius-dy*dy));
-      box(sunX-dx,sunY+dy,dx*2+1,1,"#ffe4ab");
+      box(sunX-dx,sunY+dy,dx*2+1,1,"#e9c39c");
     }
-    function ridge(base,amplitude,step,color) {
-      let previous=base;
-      for(let x=0;x<w;x+=2){
-        if(x%step===0) previous=base+amplitude*(.59*Math.sin(x*.023)+.37*Math.sin(x*.061+1)+r()*.15);
-        box(x,previous,2,h-previous,color);
+    // Broad overlapping banks of ash dim the sun and soften the distant skyline.
+    for(let i=0;i<74;i++) {
+      const x=r()*w,y=r()*h*.50,spread=16+r()*w*.17;
+      const haze=ctx.createRadialGradient(x,y,0,x,y,spread);
+      haze.addColorStop(0,i%3 ? "#544e5b24":"#b19a8d2a");
+      haze.addColorStop(1,"#62586300");
+      box(x-spread,y-spread,spread*2,spread*2,haze);
+    }
+    function ridge(base,height,color) {
+      for(let x=0;x<w;x+=2) {
+        const y=base+height*(.60*Math.sin(x*.015)+.32*Math.sin(x*.048)+r()*.12);
+        box(x,y,2,h-y,color);
       }
     }
-    ridge(h*.48,h*.12,2,"#998291");ridge(h*.54,h*.10,2,"#7f7585");ridge(h*.61,h*.07,2,"#626574");
-    for(let i=0;i<w;i+=3) fir({box,poly},i,h*.64+Math.sin(i*.04)*3,5+r()*12,"#666776");
-    ridge(h*.68,h*.035,2,"#5b6263");ridge(h*.72,h*.04,2,"#444e55");
-    box(0,ground-5,w,h-ground+5,"#56594f");
-    for(let i=0;i<w*.8;i++)box(r()*w,ground-5+r()*12,1+r()*5,1,r()>.4?"#76705a":"#41474a");
-    // Silhouetted field poles and slack wire behind the road.
-    const poles=[.04,.24,.47,.94].map((p,i)=>({x:Math.round(w*p),y:ground-25-(i%2)*9}));
-    poles.forEach(({x,y},i)=>{
-      box(x,y,2,ground-y,"#44434b");box(x-4,y+3,10,2,"#48464c");
-      if(!i)return;
-      const a=poles[i-1];
-      for(let xx=a.x;xx<x;xx+=2){const t=(xx-a.x)/(x-a.x);box(xx,a.y+(y-a.y)*t+10*t*(1-t)*4+3,2,1,"#59535b")}
+    ridge(h*.45,h*.085,"#8b7b7e");
+    const skyline=h*.52;
+    for(let x=-10;x<w;x+=8+Math.round(r()*10)){
+      const width=7+r()*13,roof=skyline-2-r()*h*.045;
+      box(x,roof,width,h*.09,"#796e72");
+      box(x+2,roof-2,width*.40,2,"#796e72");
+      if(r()>.77)box(x+width-3,roof-6-r()*6,2,15,"#796e72");
+    }
+    ridge(h*.55,h*.046,"#70676b");
+    for(let x=3;x<w;x+=5+r()*8)snag(paint,x,h*.61,4+r()*9,"#655e61",r()-.5);
+    ridge(h*.63,h*.035,"#615b5c");
+    ridge(h*.71,h*.037,"#514e50");
+    // Rubble fans and shallow craters pick out the ashen ground.
+    for(let i=0;i<w*.45;i++) {
+      const x=r()*w,y=h*(.66+r()*.145),length=1+r()*7;
+      box(x,y,length,1,i%4 ? "#615b5b":"#82766c");
+    }
+    for(let x=6;x<w;x+=28+r()*41) {
+      const y=h*(.71+r()*.055),length=7+r()*10;
+      poly([[x-length,y],[x-4,y-2],[x+length,y-1],[x+3,y+2],[x-5,y+2]],"#403e42");
+      box(x-length+3,y+2,length,1,"#766b62");
+    }
+    box(0,ground-4,w,5,"#585454");
+    for(let i=0;i<w*.6;i++) box(r()*w,ground-4+r()*5,1+r()*4,1,i%3?"#6d6460":"#48464a");
+    for(const site of burnSites) {
+      const x=w*site.x,y=h*site.y,spread=37*siteScale(site);
+      const glow=ctx.createRadialGradient(x,y-4,1,x,y-4,spread);
+      glow.addColorStop(0,"#e58c4a84");glow.addColorStop(.45,"#dd804632");glow.addColorStop(1,"#cf704000");
+      box(x-spread,y-4-spread,spread*2,spread*2,glow);
+    }
+  }
+  function burntVillage(paint) {
+    const {box,poly}=paint, r=noise(638);
+    burnSites.forEach((site,index)=>{
+      const x=w*site.x,y=h*site.y,scale=siteScale(site);
+      // Ruined masonry is opaque except where windows, a door or missing courses let the fire show through.
+      const heights=[[5,5,4,2,3,4,4,2,2,1],[2,2,4,3,3,2,1,2,5,7],[6,5,4,4,3,2,2,3,4,5]][index];
+      const brickW=4.8*scale, course=3*scale;
+      for(let col=0;col<heights.length;col++) {
+        for(let row=0;row<heights[col];row++) {
+          if((col===2 || col===7) && row===2 || col===5 && row<2) continue;
+          const bx=x+(col-5)*brickW,by=y-(row+1)*course;
+          box(bx,by,brickW,course,["#48454a","#4e484a","#554d4d"][Math.floor(r()*3)]);
+          if(row===heights[col]-1) box(bx,by,brickW,1,index===2?"#926f5d":"#806b60");
+        }
+      }
+      const left=x-24*scale,top=y-course*heights[0];
+      if(index===2) {
+        box(x+14*scale,y-27*scale,4*scale,22*scale,"#514a4b");
+        box(x+14*scale,y-27*scale,scale,15*scale,"#866657");
+        poly([[left,top-2],[left+17*scale,top+5*scale],[left+27*scale,y-3*scale],
+              [left+17*scale,top+8*scale],[left,top]],"#494348");
+      } else {
+        poly([[left,top],[left+9*scale,top-9*scale],[left+20*scale,top-3*scale],
+              [left+19*scale,top-1*scale],[left+9*scale,top-6*scale],[left+2*scale,top+2*scale]],"#4b4446");
+      }
+      for(let i=0;i<15;i++){
+        const bx=x+(r()-.5)*57*scale,by=y+r()*2*scale;
+        box(bx,by,(2+r()*4)*scale,1+scale,i%2?"#5e5552":"#484549");
+      }
     });
+    for(let x=5;x<w;x+=15+r()*22){
+      const y=h*(.65+r()*.08);
+      snag(paint,x,y,9+r()*15,"#4b484c",r()*2-1);
+    }
+    // An abandoned telegraph line sags between two snapped poles.
+    const left=w*.56,right=w*.88,base=h*.74;
+    for(const [x,height,lean] of [[left,15,-3],[right,20,3]]){
+      poly([[x-1,base],[x+1,base],[x+lean+1,base-height],[x+lean-1,base-height+1]],"#474449");
+      box(x+lean-3,base-height+3,7,1,"#514b4e");
+    }
+    for(let x=left-3;x<right+3;x+=2){
+      const t=(x-left+3)/(right-left+6);
+      box(x,base-12-5*t+21*t*(1-t),2,1,"#534c50");
+    }
   }
   function trench({box,poly}) {
     const r=noise(24);
@@ -509,28 +586,66 @@ function paintBadge(canvas, kind) {
     }
   }
 
+  // A looping heat field produces ragged, curling flames rather than a row of triangles.
+  function fireFrame(frame,count) {
+    const tile=document.createElement("canvas");
+    tile.width=48;tile.height=34;
+    const g=tile.getContext("2d"), pixels=g.createImageData(tile.width,tile.height);
+    const phase=2*Math.PI*frame/count;
+    const colors=[[151,72,48,140],[202,90,43,220],[239,132,55,248],[255,186,86,255],[255,219,145,255]];
+    for(let y=0;y<tile.height;y++){
+      const rise=(tile.height-1-y)/tile.height;
+      for(let x=0;x<tile.width;x++){
+        const curl=x+rise*(4*Math.sin(phase+rise*7)+2.5*Math.sin(2*phase+rise*11));
+        const envelope=Math.max(0,1-Math.pow((x-23.5)/24,2));
+        const heat=envelope*(.45+.16*Math.sin(curl*.56+phase+rise*8)
+                    +.15*Math.sin(curl*.29-2*phase+rise*5)+.13*Math.sin(curl*.91+2*phase+rise*9))-rise;
+        if(heat<=0)continue;
+        const color=colors[Math.min(colors.length-1,Math.floor(heat*8))];
+        pixels.data.set(color,4*(y*tile.width+x));
+      }
+    }
+    g.putImageData(pixels,0,0);return tile;
+  }
+  const fireFrames=Array.from({length:32},(_,i)=>fireFrame(i,32));
+  function smokeBillow() {
+    const tile=document.createElement("canvas");
+    tile.width=36;tile.height=28;
+    const g=tile.getContext("2d"),r=noise(42);
+    for(let i=0;i<10;i++){
+      const x=9+r()*17,y=8+r()*10,radius=5+r()*6;
+      const ash=g.createRadialGradient(x,y,1,x,y,radius);
+      ash.addColorStop(0,"#413e49b5");ash.addColorStop(.64,"#504a5380");ash.addColorStop(1,"#59535a00");
+      g.fillStyle=ash;g.fillRect(0,0,tile.width,tile.height);
+    }
+    return tile;
+  }
+  const smokeTile=smokeBillow();
   function distantFire() {
-    // Smoke hangs above the fire while brighter individual tongues rise from the ridge.
-    const x=Math.round(w*.73), y=Math.round(h*.61);
     ctx.save();
-    for(let i=0;i<10;i++) {
-      const rise=(elapsed*.17+i*.1)%1;
-      const drift=rise*rise*17+Math.sin(i*3+rise*4)*3;
-      ctx.globalAlpha=.40*(1-rise);
-      fireball(x+drift+(i%3-1)*5,y-5-rise*43,3+rise*6,"#5c5864");
-    }
-    ctx.globalAlpha=1;
-    for(let i=0;i<7;i++) {
-      const fx=x+(i-3)*3;
-      const size=4+5*Math.sin((i+1)*.39)+3*Math.sin(elapsed*3+i*1.7);
-      const lean=Math.sin(elapsed*2+i)*2;
-      poly([[fx-3,y],[fx-3,y-size*.5],[fx+lean,y-size],[fx+lean+2,y-size*.45],[fx+4,y]],"#d77c55");
-      poly([[fx-2,y],[fx,y-size*.6],[fx+2,y-2],[fx+2,y]],"#f5b968");
-    }
-    for(let i=0;i<5;i++){
-      const rise=(elapsed*.37+i*.2)%1;
-      ctx.globalAlpha=1-rise;
-      box(x+(i-2)*4+rise*7,y-4-rise*22,1,2,"#ffd996");
+    ctx.imageSmoothingEnabled=false;
+    for(const site of burnSites) {
+      const x=w*site.x, y=h*site.y, scale=siteScale(site);
+      const time=elapsed+site.phase*9;
+      // Smoke broadens and drifts with the wind as it separates from the roofline.
+      for(let i=0;i<12;i++){
+        const lift=(time*.14+i/12)%1;
+        const px=x+scale*(lift*lift*28+Math.sin(i*4+lift*5)*(2+4*lift));
+        const py=y-scale*(12+46*lift);
+        const radius=scale*(5+13*lift);
+        ctx.globalAlpha=.45*Math.sin(Math.PI*lift);
+        ctx.drawImage(smokeTile,Math.round(px-radius),Math.round(py-radius*.77),
+                      Math.ceil(radius*2),Math.ceil(radius*1.54));
+      }
+      ctx.globalAlpha=1;
+      const frame=fireFrames[Math.floor(time*14)%fireFrames.length];
+      ctx.drawImage(frame,Math.round(x-19*scale),Math.round(y-31*scale),
+                    Math.round(38*scale),Math.round(31*scale));
+      for(let i=0;i<4;i++){
+        const lift=(time*.29+i*.25)%1;
+        ctx.globalAlpha=.75*(1-lift);
+        box(x+scale*((i-2)*6+8*lift),y-scale*(9+lift*21),1,1,"#ffc385");
+      }
     }
     ctx.restore();
   }
@@ -624,7 +739,7 @@ function paintBadge(canvas, kind) {
     }
     ctx.drawImage(background,0,0);
     distantFire();
-    ctx.drawImage(trees,0,0);
+    ctx.drawImage(ruins,0,0);
     skyTracers();
     artillery();
     const age=elapsed-passStart;
@@ -653,7 +768,7 @@ function paintBadge(canvas, kind) {
     h=canvas.height=Math.round(bounds.height/2);
     ground=Math.round(h*.79);
     spriteScale=w<250 ? .75 : 1;
-    background=layer(terrain);trees=layer(nearTrees);foreground=layer(trench);draw();
+    background=layer(terrain);ruins=layer(burntVillage);foreground=layer(trench);draw();
   }
   function tick(time) {
     if(last)elapsed+=Math.min(.1,(time-last)/1000);
