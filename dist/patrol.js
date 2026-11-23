@@ -1,7 +1,6 @@
 "use strict";
 const games=[
-  // Champion portrait from Riot Games, Data Dragon 14.24.1.
-  {id:"loldle",name:"LoLdle",url:"https://loldle.net/",portrait:"teemo.png"},
+  {id:"loldle",name:"LoLdle",url:"https://loldle.net/"},
   {id:"jakitohit",name:"Jaki to hit?",url:"https://jakitohit.pl/"},
   {id:"songless",name:"Songless",url:"https://lessgames.com/songless"},
   {id:"bandle",name:"Bandle",url:"https://bandle.app/menu"},
@@ -27,16 +26,10 @@ function isDone(key){
 const entries=games.map(game=>{
   const link=document.createElement("a");
   link.className="card";link.href=game.url;link.target="_blank";link.rel="noopener noreferrer";
-  const badge=document.createElement(game.portrait ? "img" : "canvas");
+  const badge=document.createElement("canvas");
   badge.className="badge";
   badge.setAttribute("aria-hidden","true");
-  if(game.portrait){
-    badge.alt="";
-    badge.src=game.portrait;
-    badge.width=100;badge.height=84;
-  }else{
-    paintBadge(badge,game.id);
-  }
+  paintBadge(badge,game.id);
   const info=document.createElement("div");info.className="info";
   const domain=document.createElement("span");domain.className="domain";domain.textContent=new URL(game.url).hostname;
   const title=document.createElement("h3");title.textContent=game.name;
