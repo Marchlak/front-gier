@@ -49,6 +49,7 @@ function additionalVehicles({box, poly}, wheel) {
     poly([[5,-8],[13,-8],[23,-3],[28,1],[13,1]],"#354e58");
     box(13,-6,2,6,"#9da891");box(-14,-5,10,3,"#929a82");
     poly([[-4,1],[9,1],[-7,9],[-17,9]],"#485c55");
+    box(11,4,11,3,"#4b564e");box(21,4,14,2,"#626d60");
     box(-6,-19,2,10,"#434b50");
     const span=23+Math.round(16*Math.abs(Math.sin(t*13)));
     box(-6-span,-18,span*2,2,"#535762");
@@ -72,10 +73,10 @@ function additionalVehicles({box, poly}, wheel) {
   }
 
   return [
-    {name:"Ka-52",draw:helicopter,duration:7,margin:52,altitude:.19},
+    {name:"Ka-52",draw:helicopter,duration:7,margin:52,altitude:.19,muzzle:[35,5]},
     {name:"Tu-95",draw:bomber,duration:6,margin:58,altitude:.16},
-    {name:"RMMV HX 8×8",draw:truck,duration:8,margin:55},
-    {name:"Bv410",draw:articulated,duration:8,margin:49},
-    {name:"Eagle V",draw:eagle,duration:6,margin:36}
+    {name:"RMMV HX 8×8",draw:truck,duration:8,margin:55,exhaust:[-50,-13]},
+    {name:"Bv410",draw:articulated,duration:8,margin:49,exhaust:[-45,-15]},
+    {name:"Eagle V",draw:eagle,duration:6,margin:36,exhaust:[-32,-12]}
   ];
 }

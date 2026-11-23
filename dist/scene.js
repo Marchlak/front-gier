@@ -23,7 +23,8 @@ function brush(ctx) {
 }
 function paintBadge(canvas, kind) {
   canvas.width=100; canvas.height=84;
-  const {box,poly}=brush(canvas.getContext("2d"));
+  const ctx=canvas.getContext("2d");
+  const {box,poly}=brush(ctx);
   const rand=noise(39);
   if(kind==="krill") {
     box(0,0,100,84,"#18485b");
@@ -50,33 +51,59 @@ function paintBadge(canvas, kind) {
     box(0,80,100,4,"#303244");
   } else {
     const palettes={
-      loldle:["#254657","#a3c7b5"], jakitohit:["#764b63","#fab387"],
+      jakitohit:["#604255","#f4d8bb"],
       songless:["#385668","#94e2d5"], bandle:["#5f5374","#cba6f7"],
       moviespot:["#554955","#f3bc91"]
     };
     const [field,ink]=palettes[kind];
     box(0,0,100,84,field);
     for(let i=0;i<65;i++) box(rand()*100,rand()*84,1+rand()*4,1,"#ffffff14");
-    if(kind==="loldle"){
-      poly([[30,57],[65,19],[75,11],[72,26],[38,60]],"#d1dee1");
-      poly([[36,57],[74,12],[71,27],[39,61]],ink);
-      poly([[29,54],[40,64],[36,68],[24,58]],"#eab777");
-      poly([[28,59],[34,63],[23,74],[18,69]],"#967657");
-    } else if(kind==="jakitohit"){
-      poly([[34,51],[40,55],[28,70],[24,67]],"#d9b292");
-      poly([[34,49],[51,28],[60,36],[42,56]],"#3c3947");
-      poly([[47,27],[53,20],[62,17],[69,20],[73,27],[70,34],[62,40],[55,39]],ink);
-      for(let i=0;i<3;i++) poly([[51+i*3,25-i],[53+i*3,23-i],[67+i,33-i*2],[65+i,35-i*2]],"#936678");
+    if(kind==="jakitohit"){
+      // Cast-metal broadcast microphone with split grille and a suspended yoke.
+      box(32,72,36,3,"#433647");box(46,55,8,14,"#625264");box(48,56,3,13,ink);
+      poly([[33,72],[36,68],[44,67],[55,67],[64,69],[67,72]],"#c6b1ab");
+      box(37,69,25,1,"#f1d9c6");
+      poly([[30,34],[34,34],[34,47],[39,54],[44,56],[56,56],[62,53],[66,47],
+            [66,34],[70,34],[70,48],[65,56],[57,60],[43,60],[35,56],[30,48]],"#d8c2ad");
+      box(31,36,2,12,"#fff0d9");box(67,39,2,11,"#988392");
+      poly([[42,10],[56,10],[61,13],[64,19],[64,45],[60,51],[55,54],[43,54],
+            [38,51],[35,46],[35,19],[38,13]],"#4a414c");
+      poly([[43,9],[55,9],[60,12],[62,17],[62,43],[59,49],[54,51],[44,51],
+            [40,48],[38,44],[38,17],[40,12]],"#dcc7af");
+      box(41,15,2,28,"#fff0db");box(59,16,2,28,"#b6a098");
+      for(let row=0;row<6;row++){
+        const y=17+row*5;
+        box(42,y,6,2,"#57515a");box(51,y,7,2,"#57515a");
+      }
+      box(49,14,1,31,"#fff1dc");box(45,47,10,1,"#a18e8e");
+      for(const x of [30,64]){box(x,34,6,6,"#514552");box(x+1,35,3,3,ink)}
     } else if(kind==="songless"){
       box(18,23,64,40,"#233744");box(21,25,58,34,ink);box(26,30,48,20,"#557b84");
       for(const x of [35,62]){box(x-5,35,10,9,"#ced9cc");box(x-2,38,4,4,"#354954")}
       box(40,37,17,5,"#344957");
       poly([[29,58],[34,51],[66,51],[71,58]],"#708b90");box(36,55,28,2,"#334652");
     } else if(kind==="bandle"){
-      poly([[25,59],[30,49],[37,48],[41,41],[49,41],[54,46],[51,53],[46,55],[44,64],[38,69],[28,68],[24,64]],ink);
-      poly([[40,53],[66,22],[70,25],[45,57]],"#e4bb97");
-      poly([[63,24],[70,14],[77,16],[73,24],[68,29]],"#dab88e");
-      box(38,52,6,6,"#51465c");box(29,61,7,2,"#715d70");
+      ctx.save();ctx.translate(46,50);ctx.rotate(.40);
+      // Offset solid body, cream pickguard and maple headstock.
+      poly([[-13,-17],[-9,-18],[-8,-11],[-4,-7],[3,-7],[7,-12],[9,-14],
+            [12,-13],[12,-8],[9,-2],[10,4],[15,10],[17,17],[16,23],[12,28],
+            [5,30],[-8,30],[-16,26],[-19,21],[-19,15],[-17,10],[-12,4],
+            [-12,-1],[-15,-6],[-15,-12]],"#503748");
+      poly([[-13,-16],[-11,-16],[-10,-10],[-5,-5],[3,-5],[8,-10],[10,-13],
+            [11,-10],[8,-2],[9,4],[14,11],[15,18],[13,24],[7,27],[-6,28],
+            [-14,25],[-17,21],[-17,15],[-14,9],[-10,4],[-10,-2],[-13,-7]],"#df826c");
+      poly([[-12,-12],[-9,-7],[-8,-2],[-9,4],[-15,13],[-15,18],[-13,20],
+            [-13,15],[-7,7],[-6,2],[-7,-5]],"#ffb996");
+      poly([[-5,-6],[2,-6],[8,-10],[6,-3],[7,3],[11,10],[11,15],[8,19],
+            [1,19],[-5,14],[-5,8],[-2,3]],"#eee0bf");
+      box(-3,-34,6,42,"#563942");box(-2,-34,4,42,"#a67655");
+      for(const y of [-30,-24,-19,-14,-10,-6,-2,1,4]) box(-2,y,4,1,"#e0bfa1");
+      poly([[-3,-32],[-5,-36],[-4,-45],[0,-48],[5,-47],[6,-44],[3,-34],[2,-32]],"#e5b783");
+      for(const y of [-43,-39,-35]){box(-7,y,4,2,"#c4c5c7");box(3,y-2,4,2,"#c4c5c7")}
+      box(-4,7,8,3,"#54444c");box(-4,12,8,2,"#60535a");box(-4,17,8,3,"#867b7d");
+      box(-1,-33,1,52,"#e9d9bb");box(1,6,1,13,"#c5beb2");
+      box(8,16,2,2,"#eee1ca");box(8,21,2,2,"#eee1ca");
+      ctx.restore();
     } else {
       box(21,33,58,33,"#343641");box(21,32,58,4,ink);
       poly([[20,29],[76,16],[78,23],[22,36]],"#d3c6ad");
@@ -286,30 +313,46 @@ function paintBadge(canvas, kind) {
   }
 
   const roster = [
-    {name:"Czołg", draw:tank, duration:9, margin:76},
+    {name:"Czołg", draw:tank, duration:9, margin:76, exhaust:[-57,-19], muzzle:[71,-34]},
     {name:"Samolot wojskowy", draw:jet, duration:5, margin:46, altitude:.15},
     {name:"Rakieta", draw:rocket, duration:4, margin:42, altitude:.19},
-    {name:"BTR", draw:carrier, duration:8, margin:56},
+    {name:"BTR", draw:carrier, duration:8, margin:56, exhaust:[-52,-17], muzzle:[25,-34]},
     {name:"Shahed", draw:shahed, duration:7, margin:30, altitude:.15},
     {name:"Patrol pieszy", draw:footPatrol, duration:10, margin:45},
     ...additionalVehicles({box,poly},wheel)
   ];
   const nameLabel = document.getElementById("unit-name");
-  let remaining = [], current, passStart = 0;
+  const between = (min,max) => min + Math.random()*(max-min);
+  let remaining = [], current, passStart = 0, shotTime = Infinity;
   function nextUnit() {
     if (!remaining.length) remaining = roster.slice();
     // On refill the previous unit remains available after this first draw.
     const choices = remaining.filter(unit => unit !== current);
     current = choices[Math.floor(Math.random()*choices.length)];
     remaining.splice(remaining.indexOf(current),1);
+    shotTime = current.muzzle && Math.random()<.25
+      ? current.duration*between(.32,.55)
+      : Infinity;
     nameLabel.textContent = current.name;
   }
   nextUnit();
   if (preference.matches) elapsed = current.duration*.64;
 
-  const between = (min,max) => min + Math.random()*(max-min);
   let salvoStart = between(9,16);
-  let horizonX = between(.56,.86);
+  function newImpacts() {
+    // Jitter one hit inside each strip, then shuffle their firing order.
+    const count=12;
+    const hits=Array.from({length:count},(_,i)=>({
+      x:.04+.92*(i+between(.18,.82))/count,
+      y:between(.59,.72)
+    }));
+    for(let i=hits.length-1;i>0;i--) {
+      const j=Math.floor(Math.random()*(i+1));
+      [hits[i],hits[j]]=[hits[j],hits[i]];
+    }
+    return hits;
+  }
+  let hits=newImpacts();
   function fireball(x,y,r,color) {
     const shoulder=Math.round(r*.58);
     poly([[x-shoulder,y-r],[x+shoulder,y-r],[x+r,y-shoulder],[x+r,y+shoulder],
@@ -344,17 +387,19 @@ function paintBadge(canvas, kind) {
   function artillery() {
     const age=elapsed-salvoStart;
     if(age<0) return;
-    if(age>3.5) {
+    if(age>4.4) {
       salvoStart=elapsed+between(15,30);
-      horizonX=between(.56,.86);
+      hits=newImpacts();
       return;
     }
     const fall=.19;
-    for(let i=0;i<3;i++) {
-      const time=age-i*.57;
+    // Four quick waves of three; stagger both time and position within the salvo.
+    for(let i=0;i<hits.length;i++) {
+      const wave=Math.floor(i/3), slot=i%3;
+      const time=age-wave*.55-slot*.14;
       if(time<0 || time>fall+2.1) continue;
-      const x=Math.round(w*horizonX)+(i-1)*21;
-      const y=Math.round(h*.66)+[1,-3,2][i];
+      const x=Math.round(w*hits[i].x);
+      const y=Math.round(h*hits[i].y);
       if(time>=fall) {
         impact(x,y,time-fall);
         continue;
@@ -365,6 +410,45 @@ function paintBadge(canvas, kind) {
       poly([[sx-2,sy-8],[sx,sy-8],[sx+1,sy],[sx-1,sy]],"#fff0b9");
     }
   }
+  function exhaustTrail([pipeX,pipeY],age,speed) {
+    const interval=.17, lifetime=1.25;
+    const newest=Math.floor(age/interval);
+    const oldest=Math.max(0,Math.ceil((age-lifetime)/interval));
+    ctx.save();
+    for(let i=oldest;i<=newest;i++) {
+      const seconds=age-i*interval, fade=seconds/lifetime;
+      const sway=Math.sin(i*2.4);
+      const x=pipeX-seconds*(speed*.78+5+sway*2);
+      const y=pipeY-seconds*(8+sway*3)-4*fade*fade;
+      const radius=1.5+fade*4;
+      ctx.globalAlpha=.7*(1-fade);
+      fireball(x,y,radius,"#565559");
+      fireball(x-radius*.4,y-radius*.5,radius*.8,"#b3a79b");
+    }
+    ctx.restore();
+    box(pipeX,pipeY-1,5,3,"#454747");
+  }
+  function gunshot([tipX,tipY],age,speed) {
+    if(age<0 || age>.85) return;
+    ctx.save();
+    ctx.translate(tipX,tipY);
+    if(age<.13) {
+      const size=1-age/.13;
+      ctx.scale(size,size);
+      poly([[0,0],[6,-4],[9,-2],[20,-3],[15,0],[22,2],
+            [9,2],[7,4],[3,1]],"#ffad62");
+      poly([[0,0],[7,-2],[15,0],[6,2]],"#fff1bb");
+    } else {
+      const fade=(age-.13)/.72;
+      ctx.globalAlpha=.6*(1-fade);
+      for(let i=0;i<4;i++) {
+        const x=4+i*2+age*(i*4-speed*.8);
+        const y=-age*(6+i*2)+Math.sin(i*2)*2;
+        fireball(x,y,1.6+fade*3,"#c2b8a9");
+      }
+    }
+    ctx.restore();
+  }
   function draw() {
     if(elapsed-passStart>=current.duration+.35) {
       passStart=elapsed;
@@ -372,14 +456,18 @@ function paintBadge(canvas, kind) {
     }
     ctx.drawImage(background,0,0);
     artillery();
-    const progress=(elapsed-passStart)/current.duration;
+    const age=elapsed-passStart;
+    const progress=age/current.duration;
     const margin=Math.ceil(current.margin*spriteScale);
     const x=-margin+(w+2*margin)*progress;
     const y=current.altitude ? h*current.altitude : ground;
     ctx.save();
     ctx.translate(Math.round(x),Math.round(y));
     ctx.scale(spriteScale,spriteScale);
+    const speed=(w+2*margin)/(spriteScale*current.duration);
+    if(current.exhaust) exhaustTrail(current.exhaust,age,speed);
     current.draw(elapsed);
+    if(current.muzzle) gunshot(current.muzzle,age-shotTime,speed);
     ctx.restore();
     ctx.drawImage(foreground,0,0);
   }
